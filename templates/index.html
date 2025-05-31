@@ -1,0 +1,625 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FreshVeggies - Farm to Table Organic Vegetables</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      scroll-behavior: smooth;
+    }
+    
+    .hero-pattern {
+      background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(236,253,245,0.8) 100%);
+    }
+    
+    .veggie-card {
+      transition: all 0.3s ease;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .veggie-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .farm-icon {
+      background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    }
+    
+    .organic-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #10b981;
+      color: white;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    /* Carousel specific styles */
+    .carousel-container {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+    
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+    
+    .carousel-item {
+      flex: 0 0 20%; /* 5 cards visible at a time (100/5=20) */
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+    
+    .carousel-controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: white;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      z-index: 1000;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .search-item {
+      padding: 10px 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .search-item:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .search-item img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+
+    /* Responsive carousel */
+    @media (max-width: 1024px) {
+      .carousel-item {
+        flex: 0 0 33.333%; /* 3 items on tablet */
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .carousel-item {
+        flex: 0 0 50%; /* 2 items on small tablets */
+      }
+      
+      .hero-pattern {
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+      }
+      
+      nav .flex {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      nav form {
+        width: 100%;
+      }
+      
+      #search-input {
+        width: 100%;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .carousel-item {
+        flex: 0 0 100%; /* 1 item on mobile */
+      }
+      
+      .hero-pattern .flex-col {
+        padding-top: 2rem;
+      }
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-800 pt-16">
+  <!-- Navigation -->
+  <nav class="bg-green-700 text-white py-4 px-6 shadow-md fixed top-0 left-0 w-full z-50" aria-label="Main navigation">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <a href="/">
+        <h1 class="text-3xl font-extrabold tracking-tight">
+          <span class="text-red-500">🌱 Fresh</span><span class="text-yellow-400">Veggies</span>
+        </h1>
+      </a>
+      <div class="flex items-center space-x-6 relative w-full md:w-auto">
+        <form action="/search" method="GET" class="relative w-full">
+          <input type="text" name="q" placeholder="Search..." 
+                 class="rounded-full px-4 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400 w-full" 
+                 id="search-input" aria-label="Search products" />
+          <button type="submit" class="ml-2 bg-yellow-400 text-green-900 rounded-full p-2 hover:bg-yellow-300 transition shadow-md absolute right-0 top-0 h-full">
+            <i class="fas fa-search"></i>
+            <span class="sr-only">Search</span>
+          </button>
+          <div id="search-results" class="search-results hidden"></div>
+        </form>
+        <ul class="flex space-x-4 text-md font-medium">
+          <li><a href="/" class="hover:text-yellow-300 transition">Home</a></li>
+          {% if 'username' in session %}
+            <li><a href="/logout" class="hover:text-yellow-300 transition">Logout</a></li>
+          {% else %}
+            <li><a href="/login" class="hover:text-yellow-300 transition">Login</a></li>
+          {% endif %}
+          <li><a href="#about" class="hover:text-yellow-300 transition">About</a></li>
+          <li><a href="#contact" class="hover:text-yellow-300 transition">Contact</a></li>
+          <li>
+            <a href="/cart" class="relative" aria-label="Shopping cart">
+              <i class="fas fa-shopping-cart text-xl"></i>
+              {% if 'user_id' in session %}
+                <span class="absolute -top-2 -right-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs" id="cart-count">{{ cart_count }}</span>
+              {% else %}
+                <span class="absolute -top-2 -right-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
+              {% endif %}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <main id="main-content">
+    <section class="hero-pattern py-10">
+      <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 text-center md:text-left mb-10 md:mb-0">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+            <span class="text-red-500">Farm-Fresh</span> 
+            <span class="text-yellow-400">Organic</span> 
+            <span class="text-green-700">Veggies</span>
+          </h1>
+          <p class="text-lg md:text-xl text-gray-600 max-w-xl mb-8">
+            Handpicked daily from local farms. Delivered straight to your doorstep for maximum freshness.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+            <a href="#products" class="bg-yellow-400 text-green-900 px-8 py-3 rounded-full font-bold hover:bg-yellow-300 transition shadow-lg text-center">
+              Shop Now <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+            <a href="#about" class="border-2 border-green-600 text-green-700 px-8 py-3 rounded-full font-bold hover:bg-green-50 transition text-center">
+              Our Story
+            </a>
+          </div>
+          
+          <div class="mt-12 flex flex-wrap gap-6 justify-center md:justify-start">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                <i class="fas fa-truck text-green-600" aria-hidden="true"></i>
+                <span class="sr-only">Free Delivery</span>
+              </div>
+              <span>Free Delivery</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                <i class="fas fa-seedling text-green-600" aria-hidden="true"></i>
+                <span class="sr-only">100% Organic</span>
+              </div>
+              <span>100% Organic</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                <i class="fas fa-recycle text-green-600" aria-hidden="true"></i>
+                <span class="sr-only">Eco Packaging</span>
+              </div>
+              <span>Eco Packaging</span>
+            </div>
+          </div>
+        </div>
+        <div class="md:w-1/2 flex justify-center md:justify-end">
+          <div class="relative">
+            <img src="static/op.avif" 
+                 alt="Fresh organic vegetables arranged in baskets" 
+                 class="rounded-2xl shadow-xl object-cover"
+                 style="width: 100%; max-width: 700px; height: 400px;">
+            <div class="absolute -bottom-5 -left-5 bg-yellow-400 text-green-900 px-6 py-3 rounded-full font-bold">
+              Since 2010
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Carousel -->
+    <div class="relative max-w-6xl mx-auto pt-10 px-5 mb-10" id="products">
+      <h2 class="text-3xl font-bold text-center mb-8">Our Fresh Products</h2>
+      <div class="carousel-container">
+        <div class="carousel-track" id="carousel-track">
+          {% for product in products %}
+          <div class="carousel-item">
+            <div class="bg-white text-green-900 rounded-xl shadow-md p-4 relative">
+              <img src="static/{{ product.image }}" alt="{{ product.name }}" class="rounded-lg h-40 w-full object-cover mb-3">
+              <h3 class="font-semibold text-lg">{{ product.name }}</h3>
+              <p class="text-yellow-700 font-bold mb-2">₹{{ product.price }} / kg</p>
+              <button class="add-to-cart bg-yellow-400 text-green-900 px-4 py-1 rounded-full font-semibold hover:bg-yellow-300" 
+                      data-product-id="{{ product.id }}"
+                      aria-label="Add {{ product.name }} to cart">
+                <i class="fas fa-cart-plus mr-2"></i> Add
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="carousel-controls">
+        <button type="button" class="px-4 py-2 bg-yellow-400 text-green-900 rounded hover:bg-yellow-300" id="carousel-prev">
+          ← Prev
+        </button>
+        <button type="button" class="px-4 py-2 bg-yellow-400 text-green-900 rounded hover:bg-yellow-300 ml-4" id="carousel-next">
+          Next →
+        </button>
+      </div>
+    </div>
+
+    <!-- Unique About Section -->
+    <section id="about" class="py-7 bg-white">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl font-bold mb-4">Our <span class="text-green-600">Farm-to-Table</span> Journey</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">How we bring nature's best to your kitchen</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="p-8 bg-green-50 rounded-2xl shadow-md">
+            <div class="farm-icon w-16 h-16 rounded-full flex items-center justify-center mb-6">
+              <i class="fas fa-tractor text-white text-2xl" aria-hidden="true"></i>
+              <span class="sr-only">Sustainable Farming</span>
+            </div>
+            <h3 class="font-bold text-xl mb-3">Sustainable Farming</h3>
+            <p>We use regenerative agriculture practices that enrich soil and promote biodiversity.</p>
+          </div>
+
+          <div class="p-8 bg-yellow-50 rounded-2xl shadow-md">
+            <div class="farm-icon w-16 h-16 rounded-full flex items-center justify-center mb-6">
+              <i class="fas fa-hand-holding-heart text-white text-2xl" aria-hidden="true"></i>
+              <span class="sr-only">Hand Harvested</span>
+            </div>
+            <h3 class="font-bold text-xl mb-3">Hand Harvested</h3>
+            <p>Every vegetable is carefully hand-picked at peak ripeness for optimal nutrition.</p>
+          </div>
+
+          <div class="p-8 bg-red-50 rounded-2xl shadow-md">
+            <div class="farm-icon w-16 h-16 rounded-full flex items-center justify-center mb-6">
+              <i class="fas fa-bolt text-white text-2xl" aria-hidden="true"></i>
+              <span class="sr-only">Rapid Delivery</span>
+            </div>
+            <h3 class="font-bold text-xl mb-3">Rapid Delivery</h3>
+            <p>Harvested in the morning, at your doorstep by evening. Maximum 12 hours from farm.</p>
+          </div>
+
+          <div class="p-8 bg-blue-50 rounded-2xl shadow-md">
+            <div class="farm-icon w-16 h-16 rounded-full flex items-center justify-center mb-6">
+              <i class="fas fa-recycle text-white text-2xl" aria-hidden="true"></i>
+              <span class="sr-only">Zero Waste</span>
+            </div>
+            <h3 class="font-bold text-xl mb-3">Zero Waste</h3>
+            <p>We compost all unused produce and use biodegradable packaging materials.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="contact" class="bg-green-800 text-white pt-16 pb-8">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div>
+          <h3 class="text-2xl font-bold mb-6">
+            <span class="text-red-500">🌱 Fresh</span><span class="text-yellow-400">Veggies</span>
+          </h3>
+          <p class="mb-6 text-green-100">Farm-fresh organic vegetables delivered to your doorstep. Eat well, live well.</p>
+          <div class="flex space-x-4">
+            <a href="#" class="w-10 h-10 rounded-full bg-green-700 flex items-center justify-center hover:bg-green-600" aria-label="Facebook">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-green-700 flex items-center justify-center hover:bg-green-600" aria-label="Instagram">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-green-700 flex items-center justify-center hover:bg-green-600" aria-label="Twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-green-700 flex items-center justify-center hover:bg-green-600" aria-label="YouTube">
+              <i class="fab fa-youtube"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-bold mb-6">Quick Links</h4>
+          <ul class="space-y-3">
+            <li><a href="/" class="text-green-100 hover:text-yellow-300">Home</a></li>
+            <li><a href="#products" class="text-green-100 hover:text-yellow-300">Shop</a></li>
+            <li><a href="#about" class="text-green-100 hover:text-yellow-300">Our Story</a></li>
+            <li><a href="#" class="text-green-100 hover:text-yellow-300">Recipes</a></li>
+            <li><a href="#" class="text-green-100 hover:text-yellow-300">Farm Tours</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-bold mb-6">Contact Us</h4>
+          <ul class="space-y-3">
+            <li class="flex items-start">
+              <i class="fas fa-map-marker-alt mt-1 mr-3 text-yellow-400" aria-hidden="true"></i>
+              <span>Humjerbag, Chottrogram, Bangladesh</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-phone mt-1 mr-3 text-yellow-400" aria-hidden="true"></i>
+              <span>+8801991944833</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-envelope mt-1 mr-3 text-yellow-400" aria-hidden="true"></i>
+              <span>2002dhruba@gmail.com</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-bold mb-6">Message Us</h4>
+          <p class="text-green-100 mb-4">Get seasonal recipes and farm updates</p>
+          <form method="POST" action="/send_message">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-3">
+              <input type="text" name="name" placeholder="Your Name" 
+                     class="w-full rounded-full px-4 py-2 text-gray-800 focus:outline-none mb-2"
+                     aria-label="Your Name">
+            </div>
+            <div class="mb-3">
+              <input type="email" name="email" placeholder="Your Email" 
+                     class="w-full rounded-full px-4 py-2 text-gray-800 focus:outline-none mb-2"
+                     aria-label="Your Email">
+            </div>
+            <div class="mb-3">
+              <textarea name="message" placeholder="Your Message" 
+                        class="w-full rounded-2xl px-4 py-2 text-gray-800 focus:outline-none h-24"
+                        aria-label="Your Message"></textarea>
+            </div>
+            <button type="submit" class="bg-yellow-400 text-green-900 rounded-full py-2 px-6 font-bold hover:bg-yellow-300 transition w-full">
+              Send
+            </button>
+          </form>
+        </div>
+      </div>
+      
+      <div class="pt-8 border-t border-green-700 text-center text-green-200">
+        <p>© 2023 FreshVeggies. All rights reserved. Made with ❤️ for fresh food lovers</p>
+      </div>
+    </div>
+  </footer>
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <!-- other form fields -->
+</form>
+  <script>
+    // Carousel functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const carouselTrack = document.getElementById('carousel-track');
+      const prevButton = document.getElementById('carousel-prev');
+      const nextButton = document.getElementById('carousel-next');
+      const items = document.querySelectorAll('.carousel-item');
+      const totalItems = items.length;
+      let visibleItems = 5;
+      let currentPosition = 0;
+      let maxPosition = totalItems - visibleItems;
+      
+      // Initialize carousel position
+      updateVisibleItems();
+      updateCarousel();
+      
+      // Handle window resize
+      window.addEventListener('resize', function() {
+        updateVisibleItems();
+        updateCarousel();
+      });
+      
+      function updateVisibleItems() {
+        // Responsive visible items calculation
+        if (window.innerWidth >= 1024) {
+          visibleItems = 5;
+        } else if (window.innerWidth >= 768) {
+          visibleItems = 3;
+        } else {
+          visibleItems = 1;
+        }
+        maxPosition = Math.max(totalItems - visibleItems, 0);
+        
+        // Adjust current position if it exceeds new max
+        if (currentPosition > maxPosition) {
+          currentPosition = maxPosition;
+        }
+      }
+      
+      // Next button click
+      nextButton.addEventListener('click', function() {
+        if (currentPosition < maxPosition) {
+          currentPosition++;
+          updateCarousel();
+        }
+      });
+      
+      // Previous button click
+      prevButton.addEventListener('click', function() {
+        if (currentPosition > 0) {
+          currentPosition--;
+          updateCarousel();
+        }
+      });
+      
+      function updateCarousel() {
+        // Calculate the translation needed
+        const translateX = -currentPosition * (100 / visibleItems);
+        carouselTrack.style.transform = `translateX(${translateX}%)`;
+        
+        // Update button states
+        prevButton.disabled = currentPosition === 0;
+        nextButton.disabled = currentPosition === maxPosition;
+        
+        // Add/remove opacity for disabled buttons
+        if (prevButton.disabled) {
+          prevButton.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+          prevButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+        
+        if (nextButton.disabled) {
+          nextButton.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+          nextButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+      }
+      
+      // Add to cart functionality
+      const addToCartButtons = document.querySelectorAll('.add-to-cart');
+      addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const productId = this.getAttribute('data-product-id');
+          
+          fetch('/add_to_cart', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `product_id=${productId}`
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Update cart count
+              document.getElementById('cart-count').textContent = data.cart_count;
+              
+              // Show success notification
+              const notification = document.createElement('div');
+              notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center z-50';
+              notification.innerHTML = `
+                <i class="fas fa-check-circle mr-2"></i>
+                Product added to cart!
+              `;
+              document.body.appendChild(notification);
+              
+              // Remove notification after 3 seconds
+              setTimeout(() => {
+                notification.remove();
+              }, 3000);
+            } else if (data.redirect) {
+              // Redirect to login if not authenticated
+              window.location.href = data.redirect;
+            } else {
+              // Show error message
+              alert(data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error adding to cart:', error);
+            alert('Failed to add item to cart. Please try again.');
+          });
+        });
+      });
+      
+      // Search functionality with debounce
+      const searchInput = document.getElementById('search-input');
+      const searchResults = document.getElementById('search-results');
+      let searchTimeout;
+      
+      // Preload product data for client-side search
+      const productsData = Array.from(items).map(item => {
+        return {
+          id: item.querySelector('.add-to-cart').dataset.productId,
+          name: item.querySelector('h3').textContent,
+          price: item.querySelector('p').textContent,
+          image: item.querySelector('img').src
+        };
+      });
+      
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim().toLowerCase();
+        
+        if (query.length > 1) {
+          searchTimeout = setTimeout(() => {
+            // Client-side filtering
+            const filteredProducts = productsData.filter(product => 
+              product.name.toLowerCase().includes(query)
+            );
+            
+            // Clear previous results
+            searchResults.innerHTML = '';
+            
+            if (filteredProducts.length > 0) {
+              searchResults.classList.remove('hidden');
+              
+              filteredProducts.forEach(product => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-item';
+                resultItem.innerHTML = `
+                  <img src="${product.image}" alt="${product.name}">
+                  <div>
+                    <div class="font-medium">${product.name}</div>
+                    <div class="text-yellow-600 font-semibold">${product.price}</div>
+                  </div>
+                `;
+                
+                resultItem.addEventListener('click', function() {
+                  // Find and click the add to cart button
+                  const addButton = document.querySelector(`.add-to-cart[data-product-id="${product.id}"]`);
+                  if (addButton) {
+                    addButton.click();
+                  }
+                  searchInput.value = '';
+                  searchResults.classList.add('hidden');
+                });
+                
+                searchResults.appendChild(resultItem);
+              });
+            } else {
+              searchResults.classList.add('hidden');
+            }
+          }, 300); // 300ms debounce
+        } else {
+          searchResults.classList.add('hidden');
+        }
+      });
+      
+      // Close search results when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+          searchResults.classList.add('hidden');
+        }
+      });
+    });
+    headers: {
+    'X-CSRFToken': "{{ csrf_token() }}"
+}
+  </script>
+</body>
+</html>

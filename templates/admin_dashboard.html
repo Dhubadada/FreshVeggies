@@ -1,0 +1,150 @@
+<!-- templates/admin_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - FreshVeggies</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Admin Navigation -->
+  <nav class="bg-green-800 text-white py-4 px-6 shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <a href="/admin/dashboard">
+        <h1 class="text-2xl font-bold">
+          <span class="text-red-500">🌱 Fresh</span><span class="text-yellow-400">Veggies</span> Admin
+        </h1>
+      </a>
+      <div class="flex items-center space-x-6">
+        <ul class="flex space-x-4 text-md font-medium">
+          <li><a href="/admin/dashboard" class="hover:text-yellow-300 transition">Dashboard</a></li>
+          <li><a href="/admin/add_product" class="hover:text-yellow-300 transition">Add Product</a></li>
+          <li><a href="/" class="hover:text-yellow-300 transition">View Site</a></li>
+          <li><a href="/logout" class="hover:text-yellow-300 transition">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto py-8 px-4">
+    <h1 class="text-2xl font-bold mb-8">Admin Dashboard</h1>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+      <!-- Messages Card -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="bg-green-700 text-white px-6 py-4">
+          <h2 class="text-xl font-bold flex items-center">
+            <i class="fas fa-envelope mr-2"></i> Customer Messages
+          </h2>
+        </div>
+        <div class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+          {% for message in messages %}
+          <div class="p-4">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="font-bold">{{ message.name }}</h3>
+              <span class="text-sm text-gray-500">{{ message.created_at.strftime('%b %d, %Y') }}</span>
+            </div>
+            <p class="text-gray-600 mb-2">{{ message.email }}</p>
+            <p class="mb-3">{{ message.message }}</p>
+            <a href="/admin/delete_message/{{ message.id }}" class="text-red-500 hover:text-red-700 text-sm">
+              <i class="fas fa-trash mr-1"></i> Delete
+            </a>
+          </div>
+          {% else %}
+          <div class="p-6 text-center text-gray-500">
+            No messages found
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      
+      <!-- Orders Card -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="bg-green-700 text-white px-6 py-4">
+          <h2 class="text-xl font-bold flex items-center">
+            <i class="fas fa-shopping-bag mr-2"></i> Recent Orders
+          </h2>
+        </div>
+        <div class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+          {% for order in orders %}
+          <div class="p-4">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="font-bold">Order #{{ order.id }}</h3>
+              <span class="text-sm text-gray-500">{{ order.created_at.strftime('%b %d, %Y') }}</span>
+            </div>
+            <p class="font-bold text-green-600 mb-2">₹{{ order.total }}</p>
+            <div class="flex items-center mb-3">
+              <span class="mr-2">Status:</span>
+              <form method="POST" action="/admin/update_order_status/{{ order.id }}" class="flex items-center">
+                <select name="status" class="border rounded px-2 py-1 mr-2">
+                  <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                  <option value="Processing" {% if order.status == 'Processing' %}selected{% endif %}>Processing</option>
+                  <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                  <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                  <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+                <button type="submit" class="text-sm bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700">
+                  Update
+                </button>
+              </form>
+            </div>
+            <a href="#" class="text-blue-500 hover:text-blue-700 text-sm">
+              <i class="fas fa-eye mr-1"></i> View Details
+            </a>
+          </div>
+          {% else %}
+          <div class="p-6 text-center text-gray-500">
+            No orders found
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      
+      <!-- Products Card -->
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="bg-green-700 text-white px-6 py-4">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-bold flex items-center">
+              <i class="fas fa-carrot mr-2"></i> Products
+            </h2>
+            <a href="/admin/add_product" class="text-sm bg-yellow-400 text-green-900 px-3 py-1 rounded-full hover:bg-yellow-300">
+              <i class="fas fa-plus mr-1"></i> Add
+            </a>
+          </div>
+        </div>
+        <div class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+          {% for product in products %}
+          <div class="p-4">
+            <div class="flex items-center mb-3">
+              <img src="static/{{ product.image }}" alt="{{ product.name }}" class="w-16 h-16 object-cover rounded-lg mr-4">
+              <div>
+                <h3 class="font-bold">{{ product.name }}</h3>
+                <p class="text-green-600 font-bold">₹{{ product.price }}</p>
+              </div>
+            </div>
+            <div class="flex justify-end">
+              <a href="/admin/delete_product/{{ product.id }}" class="text-red-500 hover:text-red-700 text-sm">
+                <i class="fas fa-trash mr-1"></i> Delete
+              </a>
+            </div>
+          </div>
+          {% else %}
+          <div class="p-6 text-center text-gray-500">
+            No products found
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

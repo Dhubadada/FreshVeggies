@@ -1,0 +1,66 @@
+<!-- templates/order_confirmation.html - Fixed cart count -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation - FreshVeggies</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  <nav class="bg-green-700 text-white py-4 px-6 shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <a href="/">
+        <h1 class="text-3xl font-extrabold tracking-tight">
+          <span class="text-red-500">🌱 Fresh</span><span class="text-yellow-400">Veggies</span>
+        </h1>
+      </a>
+      <div class="flex items-center space-x-6">
+        <ul class="flex space-x-4 text-md font-medium">
+          <li><a href="/" class="hover:text-yellow-300 transition">Home</a></li>
+          {% if 'username' in session %}
+            <li><a href="/logout" class="hover:text-yellow-300 transition">Logout</a></li>
+          {% else %}
+            <li><a href="/login" class="hover:text-yellow-300 transition">Login</a></li>
+          {% endif %}
+          <li><a href="#about" class="hover:text-yellow-300 transition">About</a></li>
+          <li><a href="#contact" class="hover:text-yellow-300 transition">Contact</a></li>
+          <li>
+            <a href="/cart" class="relative">
+              <i class="fas fa-shopping-cart text-xl"></i>
+              <span class="absolute -top-2 -right-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-4xl mx-auto py-16 px-4 text-center">
+    <div class="inline-block bg-green-100 p-6 rounded-full mb-6">
+      <i class="fas fa-check-circle text-4xl text-green-600"></i>
+    </div>
+    <h1 class="text-3xl font-bold mb-4">Order Confirmed!</h1>
+    <p class="text-xl text-gray-600 mb-6">Thank you for your order #{{ order.id }}</p>
+    <p class="mb-8">Your fresh organic vegetables will be delivered within 24 hours.</p>
+    
+    <div class="bg-white rounded-xl shadow-md p-6 max-w-md mx-auto mb-10">
+      <h2 class="text-xl font-bold mb-4">Order Summary</h2>
+      <p class="text-2xl font-bold text-green-600 mb-6">₹{{ order.total }}</p>
+      <p class="text-gray-600">Status: <span class="font-bold">{{ order.status }}</span></p>
+    </div>
+    
+    <a href="/" class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition">
+      Continue Shopping
+    </a>
+  </div>
+</body>

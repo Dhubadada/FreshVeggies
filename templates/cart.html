@@ -1,0 +1,103 @@
+<!-- templates/cart.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart - FreshVeggies</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  <nav class="bg-green-700 text-white py-4 px-6 shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <a href="/">
+        <h1 class="text-3xl font-extrabold tracking-tight">
+          <span class="text-red-500">🌱 Fresh</span><span class="text-yellow-400">Veggies</span>
+        </h1>
+      </a>
+      <div class="flex items-center space-x-6">
+        <ul class="flex space-x-4 text-md font-medium">
+          <li><a href="/" class="hover:text-yellow-300 transition">Home</a></li>
+          {% if 'username' in session %}
+            <li><a href="/logout" class="hover:text-yellow-300 transition">Logout</a></li>
+          {% else %}
+            <li><a href="/login" class="hover:text-yellow-300 transition">Login</a></li>
+          {% endif %}
+          <li><a href="#about" class="hover:text-yellow-300 transition">About</a></li>
+          <li><a href="#contact" class="hover:text-yellow-300 transition">Contact</a></li>
+          <li>
+            <a href="/cart" class="relative">
+              <i class="fas fa-shopping-cart text-xl"></i>
+              {% if 'user_id' in session %}
+                <span class="absolute -top-2 -right-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs" id="cart-count">{{ cart_count }}</span>
+              {% else %}
+                <span class="absolute -top-2 -right-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
+              {% endif %}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-4xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold text-center mb-8">Your Shopping Cart</h1>
+    
+    {% if cart_items %}
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="divide-y divide-gray-200">
+          {% for item in cart_items %}
+          <div class="p-6 flex flex-col md:flex-row items-center">
+            <img src="static/{{ item.product.image }}" alt="{{ item.product.name }}" class="w-24 h-24 object-cover rounded-lg">
+            <div class="flex-1 md:ml-6 mt-4 md:mt-0">
+              <h3 class="text-xl font-semibold">{{ item.product.name }}</h3>
+              <p class="text-green-600 font-bold">₹{{ item.product.price }} / kg</p>
+              <div class="flex items-center mt-2">
+                <span class="mr-4">Quantity: {{ item.quantity }}</span>
+              </div>
+            </div>
+            <div class="mt-4 md:mt-0">
+              <p class="text-xl font-bold">₹{{ item.product.price * item.quantity }}</p>
+              <a href="/remove_from_cart/{{ item.id }}" class="text-red-500 hover:text-red-700 mt-2 inline-block">
+                <i class="fas fa-trash mr-1"></i> Remove
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        
+        <div class="p-6 bg-gray-50 border-t border-gray-200">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold">Total: ₹{{ total }}</h3>
+            <form method="POST" action="/checkout">
+              <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition">
+                Proceed to Checkout
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="text-center py-16">
+        <div class="inline-block bg-green-100 p-6 rounded-full mb-6">
+          <i class="fas fa-shopping-cart text-4xl text-green-600"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-4">Your cart is empty</h2>
+        <p class="text-gray-600 mb-6">Looks like you haven't added anything to your cart yet</p>
+        <a href="/#products" class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition">
+          Start Shopping
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>
