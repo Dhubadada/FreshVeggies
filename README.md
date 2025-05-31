@@ -30,18 +30,15 @@ A Flask-based e-commerce platform for fresh organic vegetables with admin dashbo
    git clone https://github.com/yourusername/FreshVeggies.git
    cd FreshVeggies
    •	python -m venv venv
-•	source venv/bin/activate
-•	pip freeze > requirements.txt
-•	Flask==2.3.2
-•	Flask-SQLAlchemy==3.0.3
-•	Flask-WTF==1.1.1
-•	Werkzeug==2.3.6
-•	python-dotenv==1.0.0
-•	python app.py
-
-
-
-
+   source venv/bin/activate
+   pip freeze > requirements.txt
+   Flask==2.3.2
+   Flask-SQLAlchemy==3.0.3
+   Flask-WTF==1.1.1
+   Werkzeug==2.3.6
+   python app.py
+   
 Default admin credentials:
+
 Username: dhruba
 Password: admin123
